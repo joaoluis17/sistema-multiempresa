@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # Backend Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - ./backend/storage:/var/www/html/storage
+    ports:
+      - "8000:8000"
+    networks:
+      - todo_network
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=multiempresadatabase
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=mailhog
+      - MAIL_PORT=1025
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: todo_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: multiempresadatabase
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - todo_network
+
+  # Redis para filas
+  redis:
+    image: redis:7-alpine
+    container_name: todo_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - todo_network
+
+  # MailHog para testar emails
+  mailhog:
+    image: mailhog/mailhog
+    container_name: todo_mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - todo_network
+
+  # # Frontend Vue.js (opcional, pode rodar separado)
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: todo_frontend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+  #   networks:
+  #     - todo_network
+  #   depends_on:
+  #     - app
+
+volumes:
+  mysql_data:
+
+networks:
+  todo_network:
+    driver: bridge
