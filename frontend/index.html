@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login com Vue 2</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>Login</h1>
+
+    <form @submit.prevent="login">
+      <div>
+        <label>Email:</label>
+        <input type="email" v-model="email" required>
+      </div>
+
+      <div>
+        <label>Senha:</label>
+        <input type="password" v-model="password" required>
+      </div>
+
+      <button type="submit">Entrar</button>
+    </form>
+
+    <pre>{{ response }}</pre>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        email: '',
+        password: '',
+        response: ''
+      },
+      methods: {
+        async login() {
+          try {
+            const res = await fetch('http://localhost:8000/api/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                email: this.email,
+                password: this.password
+              })
+            });
+
+            const data = await res.json();
+            this.response = JSON.stringify(data, null, 2);
+          } catch (err) {
+            this.response = 'Erro ao conectar com a API: ' + err.message;
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
