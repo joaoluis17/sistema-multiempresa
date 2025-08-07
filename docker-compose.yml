@@ -52,7 +52,7 @@ services:
     container_name: todo_redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6380:6379"
     networks:
       - todo_network
 
@@ -67,22 +67,22 @@ services:
     networks:
       - todo_network
 
-  # # Frontend Vue.js (opcional, pode rodar separado)
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   container_name: todo_frontend
-  #   restart: unless-stopped
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - ./frontend:/app
-  #     - /app/node_modules
-  #   networks:
-  #     - todo_network
-  #   depends_on:
-  #     - app
+  # # Frontend Vue.js
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: todo_frontend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - todo_network
+    depends_on:
+      - app
 
 volumes:
   mysql_data:

@@ -7,8 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
-    protected $fillable = ['name', 'slug'];
+    use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'slug',  // Sua migration usa 'slug', não 'identifier'
+    ];
+
+    // Relationships
     public function users()
     {
         return $this->hasMany(User::class);
