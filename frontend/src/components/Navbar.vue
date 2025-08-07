@@ -39,15 +39,5 @@ export default {
 </script>
 
 <style>
-.cabecalho {
-    padding: 2rem;
-    background-color: #f4f4f4;
-    border-bottom: 1px solid #ccc;
-}
-.logout {
-    display: flex;
-    position: relative;
-    align-items: center;
-    float: right;
-}
+
 </style>

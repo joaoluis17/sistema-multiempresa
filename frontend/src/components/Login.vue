@@ -1,11 +1,13 @@
 <template>
-  <div>
-    <h2>Login</h2>
-    <form @submit.prevent="login">
-      <input v-model="email" placeholder="Email" />
-      <input v-model="password" type="password" placeholder="Senha" />
-      <button type="submit">Entrar</button>
-    </form>
+  <div class="login-container">
+    <div class="login-box">
+      <h2 class="login-title">Login</h2>
+      <form @submit.prevent="login">
+        <input v-model="email" type="email" placeholder="Email" />
+        <input v-model="password" type="password" placeholder="Senha" />
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
   </div>
 </template>
 
