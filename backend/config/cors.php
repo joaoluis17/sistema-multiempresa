@@ -1,20 +1,16 @@
 <?php
 
 return [
-
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'login', 'logout'],
-
+    'paths' => ['api/*', 'login', 'logout'],
     'allowed_methods' => ['*'],
-
-    'allowed_origins' => ['http://localhost:8081'],
-
+    'allowed_origins' => ['*'],
+    'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
-
-    'exposed_headers' => [],
-
+    'exposed_headers' => ['Authorization'],
     'max_age' => 0,
-
-    'supports_credentials' => true, // ← ESSENCIAL
-
+    'supports_credentials' => false,
 ];
+
+
+
 

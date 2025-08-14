@@ -41,7 +41,7 @@ return [
         'provider' => 'users',
         ],
 
-        'api' => [                // ← Adicione este bloco
+        'api' => [
             'driver' => 'jwt',
             'provider' => 'users',
         ],

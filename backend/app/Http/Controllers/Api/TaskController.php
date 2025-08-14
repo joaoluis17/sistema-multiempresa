@@ -9,16 +9,9 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $user = Auth::user();
-
-        $tasks = Task::where('company_id', $user->company_id)
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->priority, fn($q) => $q->where('priority', $request->priority))
-            ->get();
-
-        return response()->json($tasks);
+        return Task::where('company_id', auth()->user()->company_id)->get();
     }
 
     public function store(Request $request)
@@ -26,60 +19,17 @@ class TaskController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'status' => 'required|in:pendente,em_andamento,concluida',
-            'priority' => 'required|in:baixa,media,alta',
-            'due_date' => 'nullable|date',
+            'status' => 'required|in:pending,in_progress,completed',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date'
         ]);
 
-        $user = Auth::user();
-
-        $task = Task::create(array_merge(
-            $request->only(['title', 'description', 'status', 'priority', 'due_date']),
-            [
-                'user_id' => $user->id,
-                'company_id' => $user->company_id,
-            ]
-        ));
+        $task = Task::create([
+            'company_id' => auth()->user()->company_id,
+            'user_id' => auth()->id(),
+            ...$request->only(['title', 'description', 'status', 'priority', 'due_date'])
+        ]);
 
         return response()->json($task, 201);
-    }
-
-    public function show($id)
-    {
-        $task = Task::where('id', $id)
-            ->where('company_id', Auth::user()->company_id)
-            ->firstOrFail();
-
-        return response()->json($task);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $task = Task::where('id', $id)
-            ->where('company_id', Auth::user()->company_id)
-            ->firstOrFail();
-
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|in:pendente,em_andamento,concluida',
-            'priority' => 'required|in:baixa,media,alta',
-            'due_date' => 'nullable|date',
-        ]);
-
-        $task->update($request->only(['title', 'description', 'status', 'priority', 'due_date']));
-
-        return response()->json($task);
-    }
-
-    public function destroy($id)
-    {
-        $task = Task::where('id', $id)
-            ->where('company_id', Auth::user()->company_id)
-            ->firstOrFail();
-
-        $task->delete();
-
-        return response()->json(['message' => 'Tarefa deletada com sucesso']);
     }
 }

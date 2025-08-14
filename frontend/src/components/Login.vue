@@ -12,7 +12,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 
 export default {
   data() {
@@ -24,25 +23,20 @@ export default {
   methods: {
     async login() {
       try {
-        // 1. Obter o cookie CSRF
-        await axios.get('/sanctum/csrf-cookie')
-
-        // 2. Fazer login
-        await axios.post('/login', {
+        const response = await this.$http.post('/auth/login', {
           email: this.email,
           password: this.password
         })
-
-        // ✅ 3. Buscar dados do usuário logado
-        const profile = await axios.get('/api/user-profile')
-        console.log('Usuário logado:', profile.data)
-
-        // 4. Redirecionar
-        this.$router.push('/')
+        
+        localStorage.setItem('jwt_token', response.data.access_token)
+        this.$router.push('/dashboard')
+        
       } catch (error) {
-        console.error('Erro ao fazer login:', error)
+        console.error('Erro no login:', error.response)
+        this.errorMessage = error.response?.data?.error || 'Erro ao fazer login'
       }
     }
   }
 }
 </script>
+

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\TaskController;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,15 +17,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user-profile', function (Request $request) {
-    return response()->json($request->user());
+Route::prefix('auth')->group(function() {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::get('me', [AuthController::class, 'me']);
 });
 
-
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::apiResource('tasks', \App\Http\Controllers\Api\TaskController::class);
+Route::middleware('auth:api')->group(function () {
+    // Rotas de tarefas com escopo de empresa
+    Route::get('/tasks', [TaskController::class, 'index']);
+    Route::post('/tasks', [TaskController::class, 'store']);
+    
+    // Exemplo com verificação explícita
+    Route::get('/company/{company}/tasks', function (Company $company) {
+        return $company->tasks;
+    });
 });
-
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
