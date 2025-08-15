@@ -1,32 +1,93 @@
+/* Estilos Globais */
 body {
   font-family: sans-serif;
-  background: #bfcbcf;
-  background: linear-gradient(90deg,rgb(139, 160, 167) 0%, rgb(192, 216, 201) 50%, rgb(248, 247, 233) 100%);
+  background: linear-gradient(90deg, rgb(139, 160, 167) 0%, rgb(192, 216, 201) 50%, rgb(248, 247, 233) 100%);
+  margin: 0;
+  padding-top: 68px; /* Compensa a altura do navbar fixo */
 }
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 68px);
+}
+
+/* Navbar */
 .cabecalho {
-    padding: 2rem;
-    background-color: #f4f4f4;
-    border-bottom: 1px solid #ccc;
+  background-color: #2c3e50;
+  color: white;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  padding: 1rem 0;
 }
+
+.navbar-container {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  gap: 1rem;
+}
+
+.usuario {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  justify-self: start;
+}
+
+.logout-container {
+  justify-self: end;
+}
+
 .logout {
-    display: flex;
-    position: relative;
-    align-items: center;
-    float: right;
+  padding: 8px 16px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
 }
+
+.logout:hover {
+  background-color: #c0392b;
+  transform: translateY(-1px);
+}
+
+/* Página Home */
 .home {
-  max-width: 600px;
-  margin: auto;
+  margin: 2rem auto;
+  padding: 2rem;
   background: white;
-  padding: 20px;
   border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
+.home-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Página Login */
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
 }
+
 .login-box {
   background: white;
   padding: 40px 30px;
@@ -35,47 +96,100 @@ body {
   width: 100%;
   max-width: 400px;
 }
+
 .login-title {
   margin-bottom: 24px;
   text-align: center;
   font-size: 24px;
   color: #333;
 }
+
+/* Formulários */
 form {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
 }
+
 input {
   padding: 12px;
-  margin-bottom: 16px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 16px;
 }
+
 input:focus {
   outline: none;
   border-color: #88b0a2;
   box-shadow: 0 0 5px rgba(136, 176, 162, 0.5);
 }
+
 button {
-  padding: 12px;
+  padding: 8px 16px;
   background-color: #88b0a2;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   font-size: 16px;
   transition: background-color 0.3s ease;
-}
-button:hover {
-  background-color: #6b9885;
   cursor: pointer;
 }
-ul {
+
+button:hover {
+  background-color: #6b9885;
+}
+
+/* Lista de Tarefas */
+.task-list {
   list-style: none;
   padding: 0;
 }
-li {
+
+.task-item {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+}
+
+.priority {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  color: white;
+}
+
+.priority.low { background: #4CAF50; }
+.priority.medium { background: #FFC107; }
+.priority.high { background: #F44336; }
+
+.task-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 1rem;
+  }
+  
+  .company-name {
+    font-size: 1rem;
+  }
+  
+  .user-section {
+    gap: 1rem;
+  }
+  
+  .logout {
+    padding: 0.4rem 1rem;
+  }
+  
+  .home-container {
+    padding: 1rem;
+    margin: 1rem auto;
+  }
 }

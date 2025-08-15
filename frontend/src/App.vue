@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Navbar v-if="showNavbar" />
+    <Navbar v-if="isAuthenticated" />
     <router-view />
   </div>
 </template>
@@ -13,8 +13,15 @@ export default {
     Navbar
   },
   computed: {
-    showNavbar() {
-      return this.$route.path !== '/login'
+    isAuthenticated() {
+      return this.$route.meta.requiresAuth;
+    }
+  },
+  watch: {
+    $route(to) {
+      if (to.meta.requiresAuth && !localStorage.getItem('jwt_token')) {
+        this.$router.push('/login');
+      }
     }
   }
 }

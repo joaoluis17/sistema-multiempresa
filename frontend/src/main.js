@@ -30,6 +30,15 @@ axios.interceptors.response.use(response => {
   return Promise.reject(error)
 })
 
+axios.interceptors.response.use(response => response, error => {
+  if (error.response.status === 401) {
+    localStorage.removeItem('jwt_token');
+    delete axios.defaults.headers.common['Authorization'];
+    router.push('/login');
+  }
+  return Promise.reject(error);
+});
+
 Vue.prototype.$http = axios
 
 new Vue({

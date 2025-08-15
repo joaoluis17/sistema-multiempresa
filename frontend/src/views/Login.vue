@@ -29,7 +29,7 @@ export default {
         })
         
         localStorage.setItem('jwt_token', response.data.access_token)
-        this.$router.push('/dashboard')
+        this.$router.push('/')
         
       } catch (error) {
         console.error('Erro no login:', error.response)

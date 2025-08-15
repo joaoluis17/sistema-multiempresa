@@ -1,86 +1,117 @@
 <template>
   <div class="home">
     <h1>Lista de Tarefas</h1>
-
-    <!-- Formulário de nova tarefa -->
+    
     <form @submit.prevent="addTask">
-      <input v-model="newTask" placeholder="Nova tarefa..." />
+      <input v-model="newTask.title" placeholder="Título" required />
+      <textarea v-model="newTask.description" placeholder="Descrição"></textarea>
+      <select v-model="newTask.priority">
+        <option value="low">Baixa</option>
+        <option value="medium">Média</option>
+        <option value="high">Alta</option>
+      </select>
+      <input type="date" v-model="newTask.due_date">
       <button type="submit">Adicionar</button>
     </form>
 
-    <!-- Lista de tarefas -->
+    <div class="filters">
+      <select v-model="statusFilter">
+        <option value="">Todos</option>
+        <option value="pending">Pendentes</option>
+        <option value="in_progress">Em progresso</option>
+        <option value="completed">Concluídas</option>
+      </select>
+    </div>
+
     <ul>
-      <li v-for="task in tasks" :key="task.id">
-        <input type="checkbox" :checked="task.completed" @change="toggleTask(task)">
-        <span :style="{ textDecoration: task.completed ? 'line-through' : 'none' }">
-          {{ task.title }}
-        </span>
-        <button @click="deleteTask(task.id)">🗑️</button>
+      <li v-for="task in filteredTasks" :key="task.id">
+        <div class="task-header">
+          <input type="checkbox" :checked="task.status === 'completed'" 
+                 @change="updateTaskStatus(task)">
+          <span class="priority" :class="task.priority">{{ task.priority }}</span>
+          <span class="due-date" v-if="task.due_date">{{ formatDate(task.due_date) }}</span>
+        </div>
+        <h3>{{ task.title }}</h3>
+        <p>{{ task.description }}</p>
+        <button @click="deleteTask(task.id)">Excluir</button>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   name: 'Home',
-  
   data() {
     return {
       tasks: [],
-      newTask: ''
+      newTask: {
+        title: '',
+        description: '',
+        status: 'pending',
+        priority: 'medium',
+        due_date: null
+      },
+      statusFilter: ''
     }
   },
-  created() {
-    this.fetchTasks()
+  computed: {
+    filteredTasks() {
+      if (!this.statusFilter) return this.tasks;
+      return this.tasks.filter(t => t.status === this.statusFilter);
+    }
+  },
+  async created() {
+    await this.fetchTasks();
   },
   methods: {
+    formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString();
+    },
     async fetchTasks() {
       try {
-        const res = await axios.get('http://localhost:8000/api/tasks')
-        this.tasks = res.data.data // depende do formato que sua API está retornando
-      } catch (err) {
-        console.error('Erro ao buscar tarefas:', err)
+        const response = await this.$http.get('/tasks');
+        this.tasks = response.data;
+      } catch (error) {
+        console.error('Erro ao buscar tarefas:', error);
+        if (error.response.status === 401) {
+          this.$router.push('/login');
+        }
       }
     },
     async addTask() {
-      if (!this.newTask) return
-
       try {
-        // Primeiro, garante que o cookie XSRF esteja setado
-        await axios.get('/sanctum/csrf-cookie')
-
-        // Depois, pode fazer a requisição autenticada
-        const res = await axios.post('/api/tasks', {
-          title: this.newTask,
-          completed: false
-        })
-
-        this.tasks.push(res.data.data)
-        this.newTask = ''
-      } catch (err) {
-        console.error('Erro ao adicionar tarefa:', err)
+        const response = await this.$http.post('/tasks', this.newTask);
+        this.tasks.push(response.data);
+        this.resetForm();
+      } catch (error) {
+        console.error('Erro ao adicionar tarefa:', error);
+      }
+    },
+    resetForm() {
+      this.newTask = {
+        title: '',
+        description: '',
+        status: 'pending',
+        priority: 'medium',
+        due_date: null
+      };
+    },
+    async updateTaskStatus(task) {
+      try {
+        const newStatus = task.status === 'completed' ? 'pending' : 'completed';
+        await this.$http.put(`/tasks/${task.id}`, { status: newStatus });
+        task.status = newStatus;
+      } catch (error) {
+        console.error('Erro ao atualizar tarefa:', error);
       }
     },
     async deleteTask(id) {
       try {
-        await axios.delete(`http://localhost:8000/api/tasks/${id}`)
-        this.tasks = this.tasks.filter(t => t.id !== id)
-      } catch (err) {
-        console.error('Erro ao excluir tarefa:', err)
-      }
-    },
-    async toggleTask(task) {
-      try {
-        const res = await axios.put(`http://localhost:8000/api/tasks/${task.id}`, {
-          title: task.title,
-          completed: !task.completed
-        })
-        task.completed = res.data.data.completed
-      } catch (err) {
-        console.error('Erro ao atualizar tarefa:', err)
+        await this.$http.delete(`/tasks/${id}`);
+        this.tasks = this.tasks.filter(t => t.id !== id);
+      } catch (error) {
+        console.error('Erro ao excluir tarefa:', error);
       }
     }
   }

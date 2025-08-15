@@ -19,17 +19,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function() {
     Route::post('login', [AuthController::class, 'login']);
-    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api');
     Route::post('refresh', [AuthController::class, 'refresh']);
     Route::get('me', [AuthController::class, 'me']);
 });
 
 Route::middleware('auth:api')->group(function () {
-    // Rotas de tarefas com escopo de empresa
     Route::get('/tasks', [TaskController::class, 'index']);
     Route::post('/tasks', [TaskController::class, 'store']);
     
-    // Exemplo com verificação explícita
     Route::get('/company/{company}/tasks', function (Company $company) {
         return $company->tasks;
     });
